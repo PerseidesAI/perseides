@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Le Windigo — Perséides</title>
+  <meta name="description" content="Découvrez Le Windigo, monstre cannibale des légendes algonquiennes, son origine, son symbolisme et ses animations.">
+  <link rel="canonical" href="https://perseidesai.github.io/perseides/windigo.html">
+  <link rel="icon" type="image/svg+xml" href="assets/img/arche.svg">
+  <link rel="preload" href="assets/fonts/nordet-gothic-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/im-fell-english-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/im-fell-english-400-italic.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/cinzel-400.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/cinzel-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/eb-garamond-400-italic-grec.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/img/perseids.jpg" as="image">
+  <link rel="preload" href="assets/img/arche.svg" as="image">
+<style>
+/*
+  Plan de design
+  Mise en page : une page posée sur la forêt, colonne centrale symétrique,
+  trois niches en arc brisé pour les trois animations du personnage, à leur taille d'origine.
+  Palette : uniquement des teintes échantillonnées sur le motif de sapins (marine, ardoise, brume).
+  Aucun or, aucun rouge : seul le personnage apporte une couleur chaude.
+  Typo : gothique pour le nom du site, IM Fell English pour le texte, Cinzel pour les petites étiquettes, EB Garamond italique pour le grec.
+*/
+  
+/* 1. Déclaration de la police gothique */
+@font-face {
+    font-family: 'nordet-gothic';
+    src: url('assets/fonts/nordet-gothic-700.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face{font-family:"IM Fell English";font-weight:400;font-style:normal;font-display:swap;src:url("assets/fonts/im-fell-english-400.woff2") format("woff2")}
+@font-face{font-family:"IM Fell English";font-weight:400;font-style:italic;font-display:swap;src:url("assets/fonts/im-fell-english-400-italic.woff2") format("woff2")}
+@font-face{font-family:"Cinzel";font-weight:400;font-style:normal;font-display:swap;src:url("assets/fonts/cinzel-400.woff2") format("woff2")}
+@font-face{font-family:"Cinzel";font-weight:700;font-style:normal;font-display:swap;src:url("assets/fonts/cinzel-700.woff2") format("woff2")}
+@font-face{font-family:"EB Garamond";font-weight:400;font-style:italic;font-display:swap;src:url("assets/fonts/eb-garamond-400-italic-grec.woff2") format("woff2");unicode-range:U+0370-0377,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
+
+:root{
+  color-scheme:dark;
+  --night:#050f1f;
+  --ink:#071326;
+  --slate:#294160;
+  --slate-hi:#3e5775;
+  --mist:#617a98;
+  --frost:#94adcc;
+  --ice:#adc6e5;
+  --snow:#e6eef8;
+  --text:#d2deec;
+  --veil:rgba(4,12,26,.42);
+  --panel:rgba(5,15,31,.93);
+  --band:rgba(4,11,24,.95);
+  --font-gothic:"nordet-gothic","Nordet Gothic","UnifrakturCook","UnifrakturMaguntia","Old English Text MT",serif;
+  --font-body:"IM Fell English","Iowan Old Style",Georgia,"Times New Roman",serif;
+  --font-label:"Cinzel","Trajan Pro",Georgia,serif;
+  --font-greek:"EB Garamond","Times New Roman",serif;
+  --forest:url("assets/img/perseids.jpg");
+  --arch:url("assets/img/arche.svg");
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;font-synthesis:none;text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+body{
+  margin:0;
+  background-color:var(--night);
+  background-image:linear-gradient(var(--veil),var(--veil)),var(--forest);
+  background-size:auto,250px 250px;
+  background-repeat:repeat;
+  color:var(--text);
+  font-family:var(--font-body);
+  font-size:1.2rem;
+  line-height:1.6;
+}
+::selection{background:var(--slate-hi);color:var(--snow)}
+a:focus-visible{outline:2px solid var(--ice);outline-offset:4px}
+section[id]{scroll-margin-top:1.5rem}
+
+.wrap{
+  width:100%;
+  max-width:1104px;
+  margin-inline:auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+
+/* Nom du site */
+.logo{
+  margin:0;
+  font-family:var(--font-gothic);
+  font-weight:700;
+  font-size:clamp(4.4rem,14vw,7.6rem);
+  line-height:.95;
+  letter-spacing:.01em;
+  color:var(--snow);
+  text-shadow:0 2px 0 #02060e,0 0 26px rgba(0,0,0,.55);
+}
+
+/* Bandeau du haut */
+.masthead{position:relative;background:var(--band);border-bottom:1px solid var(--slate-hi)}
+.masthead::after{content:"";position:absolute;left:0;right:0;bottom:5px;height:1px;background:var(--slate)}
+.masthead .wrap{padding-block:clamp(1.3rem,4vw,2.1rem) 1.2rem;text-align:center}
+.menu{margin-top:.5rem}
+.menu ul{display:flex;flex-wrap:wrap;justify-content:center;gap:.2rem 2.2rem;margin:0;padding:0;list-style:none}
+.menu a{
+  display:inline-block;
+  padding:.55rem .1rem;
+  font:400 .84rem/1 var(--font-label);
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--ice);
+  text-decoration:none;
+  border-bottom:1px solid transparent;
+  transition:color .2s,border-color .2s;
+}
+.menu a:hover{color:var(--snow);border-bottom-color:var(--frost)}
+
+/* Page centrale */
+.stage{padding-block:clamp(1.5rem,4vw,2.75rem)}
+.page{
+  position:relative;
+  display:grid;
+  gap:clamp(1.75rem,4vw,2.75rem);
+  padding:clamp(1.25rem,5vw,3.25rem);
+  background-color:transparent;
+  background-image:linear-gradient(var(--panel),var(--panel)),var(--forest);
+  background-size:auto,250px 250px;
+  border:1px solid var(--slate-hi);
+  box-shadow:0 28px 60px rgba(0,0,0,.45);
+}
+.page::before{content:"";position:absolute;inset:6px;border:1px solid var(--slate);pointer-events:none}
+.page>*{min-width:0}
+
+.title{display:grid;gap:.3rem;justify-items:center;text-align:center}
+.character-name{
+  margin:0;
+  max-width:100%;
+  font-weight:400;
+  font-size:clamp(2.6rem,9.5vw,5.4rem);
+  line-height:1;
+  letter-spacing:.012em;
+  color:var(--snow);
+  overflow-wrap:break-word;
+  text-wrap:balance;
+}
+
+.greek{margin:0;font:italic 400 1.55rem/1.2 var(--font-greek);letter-spacing:.04em;color:var(--frost)}
+.lead{margin:.55rem 0 0;font-style:italic;font-size:clamp(1.2rem,3vw,1.45rem);color:var(--ice);text-wrap:balance}
+
+.rule{display:flex;align-items:center;gap:.9rem}
+.rule span{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--slate-hi) 35%,var(--slate-hi) 65%,transparent)}
+.rule i{width:8px;height:8px;border:1px solid var(--frost);transform:rotate(45deg)}
+
+/* Les trois animations du personnage, à leur taille d'origine (512 px, jamais redimensionnées) */
+.plates{display:flex;flex-wrap:wrap;justify-content:center;gap:2.5rem 2rem}
+.plate{margin:0;width:min(280px,100%);display:grid;justify-items:center;gap:.85rem}
+.niche{position:relative;width:100%;max-width:280px;aspect-ratio:280/330;background:var(--arch) center/100% 100% no-repeat}
+.niche img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  max-width:none;
+  object-fit:none;
+  object-position:50% calc(50% + 83px);
+  image-rendering:pixelated;
+}
+.niche img{object-position:50% calc(50% + 58px)}
+.numeral{
+  position:absolute;
+  top:40px;
+  left:0;
+  right:0;
+  text-align:center;
+  font:700 .8rem/1 var(--font-label);
+  letter-spacing:.22em;
+  padding-left:.22em;
+  color:var(--ice);
+}
+.plate figcaption{display:grid;justify-items:center;text-align:center;line-height:1.3}
+.plate .pose{font-style:italic;font-size:1.05rem;color:var(--frost)}
+
+/* 2. Style du paragraphe */
+.intro {
+    max-width: 620px;
+    margin: 0 auto;
+    font-size: 1.15rem;
+    line-height: 1.75;
+    color: #cbd5e1;
+    text-align: left;
+}
+
+/* Fiche et origine */
+.cols{display:grid;gap:2.5rem}
+h2{margin:0 0 .6rem;font:italic 400 clamp(1.7rem,4vw,2.1rem)/1.15 var(--font-body);color:var(--snow);text-wrap:balance}
+.sheet{margin:0;display:grid}
+.sheet>div{display:grid;grid-template-columns:11rem minmax(0,1fr);gap:1rem;padding:.7rem 0;border-top:1px solid var(--slate)}
+.sheet>div:last-child{border-bottom:1px solid var(--slate)}
+.sheet dt{padding-top:.28rem;font:700 .76rem/1.7 var(--font-label);letter-spacing:.14em;text-transform:uppercase;color:var(--frost)}
+.sheet dd{margin:0;text-wrap:balance}
+
+.grc{font-family:var(--font-greek);font-style:italic;color:var(--ice)}
+.origin i,.sheet i,.grc,.nb{hyphens:none;white-space:nowrap}
+
+@media (min-width:880px){
+  .cols{grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:0}
+  .cols>section:first-child{padding-right:2.75rem}
+  .cols>section+section{padding-left:2.75rem;border-left:1px solid var(--slate)}
+}
+@media (max-width:480px){
+  .sheet>div{grid-template-columns:minmax(0,1fr);gap:.1rem}
+}
+
+/* 3. Style de la lettrine gothique */
+.dropcap {
+    float: left;
+    font-size: 4.2rem;
+    line-height: 0.75;
+    padding-top: 3px;
+    padding-right: 12px;
+    padding-bottom: 0;
+    padding-left: 0;
+    font-family: 'nordet-gothic', serif;
+    color: #f8fafc;
+    transform: translateY(2px);
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+blockquote {
+    margin: 2rem auto;
+    max-width: 38rem;
+    padding: 1rem 1.5rem;
+    border-left: 2px solid var(--slate-hi);
+    font-style: italic;
+    color: var(--ice);
+}
+blockquote footer {
+    margin-top: .8rem;
+    font-style: normal;
+    font-family: var(--font-label);
+    font-size: .85rem;
+    letter-spacing: .1em;
+    color: var(--frost);
+    text-align: right;
+}
+
+/* Bandeau du bas */
+.foot{position:relative;background:var(--band);border-top:1px solid var(--slate-hi)}
+.foot::before{content:"";position:absolute;left:0;right:0;top:5px;height:1px;background:var(--slate)}
+.foot .wrap{display:grid;justify-items:center;gap:.2rem;padding-block:1.7rem 1.9rem;text-align:center}
+.logo--sm{font-size:2.9rem}
+.copyright{margin:0;font-style:italic;font-size:1.05rem;color:var(--frost)}
+
+/* Ajustements d'esthétique */
+.logo-link{display:block;color:inherit;text-decoration:none}
+a.logo{color:var(--snow);text-decoration:none}
+@media (max-width:480px){
+  .menu ul{gap:.2rem 1.1rem}
+  .menu a{font-size:.78rem;letter-spacing:.14em}
+}
+</style>
+</head>
+
+<body>
+<div class="site" lang="fr">
+
+  <header class="masthead">    
+    <div class="wrap">      
+      <a href="index.html" class="logo-link">
+        <p class="logo">Perséides</p>
+      </a>
+      <nav class="menu" aria-label="Navigation principale">
+        <ul>
+          <li><a href="#windigo">Le Windigo</a></li>
+          <li><a href="#créature">Créature</a></li>
+          <li><a href="#origines">Origines</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="wrap">
+      <div class="page">
+
+        <section id="windigo" class="title" aria-labelledby="nom-personnage">
+          <h1 class="character-name logo" id="nom-personnage">Le Windigo</h1>
+          <p style="font-style: italic; color: var(--frost); opacity: .8; font-size: 0.9em;">Aussi nommé wendigo, atchen, chenoo ou kewok.</p>
+          <p class="lead">Monstre cannibale des légendes algonquiennes.</p>
+        </section>
+
+        <div class="rule" aria-hidden="true"><span></span><i></i><span></span></div>
+
+        <div class="plates">
+          <figure class="plate">
+            <div class="niche">
+              <span class="numeral" aria-hidden="true">I</span>
+              <img src="assets/img/windigo-repos.gif" width="512" height="512" alt="Windigo au repos.">
+            </div>
+            <figcaption><span class="pose">au repos</span></figcaption>
+          </figure>
+
+          <figure class="plate">
+            <div class="niche">
+              <span class="numeral" aria-hidden="true">II</span>
+              <img src="assets/img/windigo-marche.gif" width="512" height="512" alt="Windigo en marche.">
+            </div>
+            <figcaption><span class="pose">en marche</span></figcaption>
+          </figure>
+
+          <figure class="plate">
+            <div class="niche">
+              <span class="numeral" aria-hidden="true">III</span>
+              <img src="assets/img/windigo-attaque.gif" width="512" height="512" alt="Windigo en attaque.">
+            </div>
+            <figcaption><span class="pose">en attaque</span></figcaption>
+          </figure>
+        </div>
+
+        <p id="legende" class="intro"><span class="dropcap">D</span>ans la tradition orale des Premières nations de langue algonquienne, le windigo est un monstre puissant, animé par le désir de tuer et de manger ses victimes. Dans la plupart des récits, un humain le devient par cupidité ou par faiblesse : la légende met en garde contre l’isolement et l’oubli de la communauté.</p>
+
+        <div class="rule" aria-hidden="true"><span></span><i></i><span></span></div>
+
+        <div class="cols">
+          <section id="créature" aria-labelledby="titre-créature">
+            <h2 id="titre-créature">Créature</h2>
+            <dl class="sheet">
+              <div><dt>Groupe</dt><dd>Folklore</dd></div>
+              <div><dt>Sous-groupe</dt><dd>Monstre, être surnaturel</dd></div>
+              <div><dt>Caractéristiques</dt><dd>Force surhumaine<br>Maigre à peau grise ou géant</dd></div>
+              <div><dt>Habitat</dt><dd>Régions boréales</dd></div>
+            </dl>
+          </section>
+
+          <section id="origines" aria-labelledby="titre-origines">
+            <h2 id="titre-origines">Origines</h2>
+            <dl class="sheet">
+              <div><dt>Origines</dt><dd>Premières nations algonquiennes</dd></div>
+              <div><dt>Région</dt><dd>Canada<br>Québec</dd></div>
+              <div><dt>Première mention</dt><dd>P. Le Jeune, rapport de 1636</dd></div>
+            </dl>
+          </section>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <footer class="foot" id="mainFooter"> 
+    <div class="wrap">  
+      <a href="index.html" class="logo logo--sm">Perséides</a>  
+      <p class="copyright">&copy; 2026 Perséides. Tous droits réservés.</p>  
+    </div>
+  </footer>
+
+</div>
+
+</body>
+</html>
