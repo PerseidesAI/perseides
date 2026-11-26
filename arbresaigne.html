@@ -158,7 +158,7 @@ section[id]{scroll-margin-top:1.5rem}
 .rule span{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--slate-hi) 35%,var(--slate-hi) 65%,transparent)}
 .rule i{width:8px;height:8px;border:1px solid var(--frost);transform:rotate(45deg)}
 
-/* Les trois animations du personnage, ajustées à l'arc et cliquables */
+/* Les trois animations du personnage, à leur taille d'origine ou ajustées si trop grandes */
 .plates{display:flex;flex-wrap:wrap;justify-content:center;gap:2.5rem 2rem}
 .plate{margin:0;width:min(280px,100%);display:grid;justify-items:center;gap:.85rem}
 .niche{position:relative;width:100%;max-width:280px;aspect-ratio:280/330;background:var(--arch) center/100% 100% no-repeat}
@@ -179,19 +179,26 @@ section[id]{scroll-margin-top:1.5rem}
 }
 .niche img{
   position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  max-width:none;
+  object-fit:none;
+  object-position:50% calc(50% + 83px);
+  image-rendering:pixelated;
+}
+.niche.is-oversized img{
+  inset:auto;
   left:50%;
   top:58%;
   width:auto;
   height:auto;
-  max-width:none;
-  max-height:none;
   object-fit:contain;
   transform:translate(calc(-50% + var(--sprite-dx, 0px)), calc(-50% + var(--sprite-dy, 0px))) scale(var(--sprite-scale, 0.64));
   transform-origin:center center;
-  image-rendering:pixelated;
   transition:transform .2s ease,filter .2s ease;
 }
-.niche-trigger:hover img{
+.niche.is-oversized .niche-trigger:hover img{
   transform:translate(calc(-50% + var(--sprite-dx, 0px)), calc(-50% + var(--sprite-dy, 0px))) scale(calc(var(--sprite-scale, 0.64) * 1.04));
   filter:brightness(1.06);
 }
@@ -431,35 +438,46 @@ a.logo{color:var(--snow);text-decoration:none}
 
 <script>
 (function () {
-  // Ajuste chaque sprite pour que la créature soit la plus grande possible dans l'arc (.niche)
-  // sans dépasser les bords (en tenant compte des marges transparentes d'un canvas 1024x1024).
-  function fitSpritesToNiches() {
+  // Ne modifie que les sprites qui dépassent normalement la niche (.niche) :
+  // ils sont rapetissés pour être le plus gros possible dedans sans dépasser les bords.
+  // Les autres créatures gardent leur rendu d'origine intact.
+  function fitOversizedSprites() {
     document.querySelectorAll(".niche").forEach((niche) => {
       const img = niche.querySelector("img");
       if (!img) return;
-      const applyScale = () => {
-        const nw = img.naturalWidth || 1024;
-        const nh = img.naturalHeight || 1024;
+      const applyFit = () => {
+        const nw = img.naturalWidth || 512;
+        const nh = img.naturalHeight || 512;
         const nRect = niche.getBoundingClientRect();
         const boxW = nRect.width || 280;
         const boxH = nRect.height || 330;
 
-        // Zone intérieure de l'arc sans toucher les bords
+        const exceedsBox = nw > boxW || nh > boxH;
+        if (!exceedsBox) {
+          niche.classList.remove("is-oversized");
+          img.style.removeProperty("--sprite-scale");
+          img.style.removeProperty("--sprite-dx");
+          img.style.removeProperty("--sprite-dy");
+          return;
+        }
+
+        niche.classList.add("is-oversized");
+
         const innerW = boxW * 0.74;
         const innerH = boxH * 0.62;
 
-        let scale = 1;
+        let scale;
         let dx = 0;
         let dy = 0;
 
         if (nw >= 900 || nh >= 900) {
-          // Sprite dessiné au centre haut de la toile 1024x1024
+          // Pour un canvas 1024x1024 où l'arbre occupe le centre haut (~34% x ~31%)
           const spriteSpanW = nw * 0.34;
           const spriteSpanH = nh * 0.31;
           scale = Math.min(innerW / spriteSpanW, innerH / spriteSpanH);
           dy = boxH * 0.05;
         } else {
-          scale = Math.min(innerW / nw, innerH / nh, 1);
+          scale = Math.min(innerW / nw, innerH / nh);
         }
 
         img.style.setProperty("--sprite-scale", scale.toFixed(4));
@@ -468,15 +486,15 @@ a.logo{color:var(--snow);text-decoration:none}
       };
 
       if (img.complete && img.naturalWidth) {
-        applyScale();
+        applyFit();
       } else {
-        img.addEventListener("load", applyScale, { once: true });
+        img.addEventListener("load", applyFit, { once: true });
       }
     });
   }
 
-  fitSpritesToNiches();
-  window.addEventListener("resize", fitSpritesToNiches);
+  fitOversizedSprites();
+  window.addEventListener("resize", fitOversizedSprites);
 
   const overlay = document.getElementById("gifOverlay");
   if (!overlay) return;
