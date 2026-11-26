@@ -382,6 +382,112 @@ a.logo{color:var(--snow);text-decoration:none}
   </footer>
 
 </div>
+  
+<div class="gif-overlay" id="gifOverlay" role="dialog" aria-modal="true" aria-label="Aperçu du GIF" hidden>
+  <img class="gif-overlay__img" id="gifOverlayImg" src="" alt="">
+</div>
 
+<script>
+(function () {
+  // Ne modifie que les sprites qui dépassent normalement la niche (.niche) :
+  // ils sont rapetissés pour être le plus gros possible dedans sans dépasser les bords.
+  // Les autres créatures gardent leur rendu d'origine intact.
+  function fitOversizedSprites() {
+    document.querySelectorAll(".niche").forEach((niche) => {
+      const img = niche.querySelector("img");
+      if (!img) return;
+      const applyFit = () => {
+        const nw = img.naturalWidth || 512;
+        const nh = img.naturalHeight || 512;
+        const nRect = niche.getBoundingClientRect();
+        const boxW = nRect.width || 280;
+        const boxH = nRect.height || 330;
+
+        const exceedsBox = nw > boxW || nh > boxH;
+        if (!exceedsBox) {
+          niche.classList.remove("is-oversized");
+          img.style.removeProperty("--sprite-scale");
+          img.style.removeProperty("--sprite-dx");
+          img.style.removeProperty("--sprite-dy");
+          return;
+        }
+
+        niche.classList.add("is-oversized");
+
+        const innerW = boxW * 0.74;
+        const innerH = boxH * 0.62;
+
+        let scale;
+        let dx = 0;
+        let dy = 0;
+
+        if (nw >= 900 || nh >= 900) {
+          // Pour un canvas 1024x1024 où l'arbre occupe le centre haut (~34% x ~31%)
+          const spriteSpanW = nw * 0.34;
+          const spriteSpanH = nh * 0.31;
+          scale = Math.min(innerW / spriteSpanW, innerH / spriteSpanH);
+          dy = boxH * 0.05;
+        } else {
+          scale = Math.min(innerW / nw, innerH / nh);
+        }
+
+        img.style.setProperty("--sprite-scale", scale.toFixed(4));
+        img.style.setProperty("--sprite-dx", `${dx.toFixed(1)}px`);
+        img.style.setProperty("--sprite-dy", `${dy.toFixed(1)}px`);
+      };
+
+      if (img.complete && img.naturalWidth) {
+        applyFit();
+      } else {
+        img.addEventListener("load", applyFit, { once: true });
+      }
+    });
+  }
+
+  fitOversizedSprites();
+  window.addEventListener("resize", fitOversizedSprites);
+
+  const overlay = document.getElementById("gifOverlay");
+  if (!overlay) return;
+  const overlayImg = document.getElementById("gifOverlayImg");
+  let lastTrigger = null;
+
+  function openGif(trigger) {
+    const img = trigger.querySelector("img");
+    const src = trigger.getAttribute("data-gif") || (img ? img.getAttribute("src") : "");
+    const alt = trigger.getAttribute("data-caption") || (img ? img.getAttribute("alt") : "") || "";
+    if (!src) return;
+    lastTrigger = trigger;
+    overlayImg.src = src;
+    overlayImg.alt = alt;
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
+  }
+
+  function closeGif() {
+    overlay.classList.remove("is-open");
+    overlay.hidden = true;
+    overlayImg.src = "";
+    if (lastTrigger) {
+      lastTrigger.focus();
+      lastTrigger = null;
+    }
+  }
+
+  document.querySelectorAll(".niche-trigger").forEach((btn) => {
+    btn.addEventListener("click", () => openGif(btn));
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target !== overlayImg) closeGif();
+  });
+
+  overlayImg.addEventListener("click", closeGif);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.hidden) closeGif();
+  });
+})();
+</script>
 </body>
 </html>
