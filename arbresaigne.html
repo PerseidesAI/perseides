@@ -473,25 +473,57 @@ a.logo{color:var(--snow);text-decoration:none}
 
 </div>
 
-  <div class="gif-modal" id="gifModal" role="dialog" aria-modal="true" aria-labelledby="gifModalCaption" hidden>
-    <div class="gif-modal__dialog">
-      <button type="button" class="gif-modal__close" id="gifModalClose" aria-label="Fermer la fenêtre">Fermer &times;</button>
-      <img class="gif-modal__img" id="gifModalImg" src="" alt="">
-      <p class="gif-modal__caption" id="gifModalCaption"></p>
-    </div>
+<!-- Fenêtre modale pour l'affichage plein écran du GIF -->
+<div class="gif-modal" id="gifModal" role="dialog" aria-modal="true" aria-labelledby="gifModalCaption" hidden>
+  <div class="gif-modal__dialog">
+    <button type="button" class="gif-modal__close" id="gifModalClose" aria-label="Fermer la fenêtre">Fermer &times;</button>
+    <img class="gif-modal__img" id="gifModalImg" src="" alt="">
+    <p class="gif-modal__caption" id="gifModalCaption"></p>
   </div>
+</div>
 
 <script>
 (function () {
+  // Ajuste automatiquement les sprites trop grands pour tenir dans chaque arc (.niche)
+  function fitSpritesToNiches() {
+    document.querySelectorAll(".niche").forEach((niche) => {
+      const img = niche.querySelector("img");
+      if (!img) return;
+      const applyScale = () => {
+        const nw = img.naturalWidth || 512;
+        const nh = img.naturalHeight || 512;
+        const nRect = niche.getBoundingClientRect();
+        const availW = (nRect.width || 280) * 0.76;
+        const availH = (nRect.height || 330) * 0.62;
+        let scale = 1;
+        if (nw > availW || nh > availH) {
+          scale = Math.min(availW / nw, availH / nh);
+        }
+        img.style.setProperty("--sprite-scale", scale.toFixed(4));
+      };
+      if (img.complete && img.naturalWidth) {
+        applyScale();
+      } else {
+        img.addEventListener("load", applyScale, { once: true });
+      }
+    });
+  }
+
+  fitSpritesToNiches();
+  window.addEventListener("resize", fitSpritesToNiches);
+
   const modal = document.getElementById("gifModal");
+  if (!modal) return;
   const modalImg = document.getElementById("gifModalImg");
   const modalCaption = document.getElementById("gifModalCaption");
   const closeBtn = document.getElementById("gifModalClose");
   let lastTrigger = null;
 
   function openModal(trigger) {
-    const src = trigger.getAttribute("data-gif");
-    const caption = trigger.getAttribute("data-caption") || "";
+    const img = trigger.querySelector("img");
+    const src = trigger.getAttribute("data-gif") || (img ? img.getAttribute("src") : "");
+    const caption = trigger.getAttribute("data-caption") || (img ? img.getAttribute("alt") : "") || "";
+    if (!src) return;
     lastTrigger = trigger;
     modalImg.src = src;
     modalImg.alt = caption;
