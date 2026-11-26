@@ -297,32 +297,39 @@ a.logo{color:var(--snow);text-decoration:none}
         </section>
 
         <div class="rule" aria-hidden="true"><span></span><i></i><span></span></div>
-
-        <div class="plates">
+        
+          <div class="plates">
           <figure class="plate">
             <div class="niche">
               <span class="numeral" aria-hidden="true">I</span>
-              <img src="assets/img/memphré-repos.gif" width="512" height="512" alt="Memphré au repos.">
+              <button type="button" class="niche-trigger" data-gif="assets/img/memphré-repos.gif" data-caption="Memphré — repos" aria-label="Afficher l’animation Memphré au repos en grand">
+                <img src="assets/img/memphré-repos.gif" width="512" height="512" alt="Memphré au repos.">
+              </button>
             </div>
             <figcaption><span class="pose">repos</span></figcaption>
           </figure>
 
+          <div class="plates">
           <figure class="plate">
             <div class="niche">
-              <span class="numeral" aria-hidden="true">II</span>
-              <img src="assets/img/memphré-nage.gif" width="512" height="512" alt="Memphré en nage.">
+              <span class="numeral" aria-hidden="true">I</span>
+              <button type="button" class="niche-trigger" data-gif="assets/img/memphré-nage.gif" data-caption="Memphré — nage" aria-label="Afficher l’animation Memphré nage en grand">
+                <img src="assets/img/memphré-nage.gif" width="512" height="512" alt="Memphré nage.">
+              </button>
             </div>
             <figcaption><span class="pose">nage</span></figcaption>
           </figure>
 
+          <div class="plates">
           <figure class="plate">
             <div class="niche">
-              <span class="numeral" aria-hidden="true">III</span>
-              <img src="assets/img/memphré-nage-II.gif" width="512" height="512" alt="Memphré en nage II.">
+              <span class="numeral" aria-hidden="true">I</span>
+              <button type="button" class="niche-trigger" data-gif="assets/img/memphré-nage-II.gif" data-caption="Memphré — repos" aria-label="Afficher l’animation Memphré nage II en grand">
+                <img src="assets/img/memphré-nage-II.gif" width="512" height="512" alt="Memphré nage II.">
+              </button>
             </div>
             <figcaption><span class="pose">nage II</span></figcaption>
           </figure>
-        </div>
 
          <div id="legende" class="intro">
           <p>
@@ -389,9 +396,6 @@ a.logo{color:var(--snow);text-decoration:none}
 
 <script>
 (function () {
-  // Ne modifie que les sprites qui dépassent normalement la niche (.niche) :
-  // ils sont rapetissés pour être le plus gros possible dedans sans dépasser les bords.
-  // Les autres créatures gardent leur rendu d'origine intact.
   function fitOversizedSprites() {
     document.querySelectorAll(".niche").forEach((niche) => {
       const img = niche.querySelector("img");
@@ -403,8 +407,7 @@ a.logo{color:var(--snow);text-decoration:none}
         const boxW = nRect.width || 280;
         const boxH = nRect.height || 330;
 
-        const exceedsBox = nw > boxW || nh > boxH;
-        if (!exceedsBox) {
+        if (nw <= boxW && nh <= boxH) {
           niche.classList.remove("is-oversized");
           img.style.removeProperty("--sprite-scale");
           img.style.removeProperty("--sprite-dx");
@@ -413,19 +416,14 @@ a.logo{color:var(--snow);text-decoration:none}
         }
 
         niche.classList.add("is-oversized");
-
         const innerW = boxW * 0.74;
         const innerH = boxH * 0.62;
-
         let scale;
         let dx = 0;
         let dy = 0;
 
         if (nw >= 900 || nh >= 900) {
-          // Pour un canvas 1024x1024 où l'arbre occupe le centre haut (~34% x ~31%)
-          const spriteSpanW = nw * 0.34;
-          const spriteSpanH = nh * 0.31;
-          scale = Math.min(innerW / spriteSpanW, innerH / spriteSpanH);
+          scale = Math.min(innerW / (nw * 0.34), innerH / (nh * 0.31));
           dy = boxH * 0.05;
         } else {
           scale = Math.min(innerW / nw, innerH / nh);
@@ -436,11 +434,8 @@ a.logo{color:var(--snow);text-decoration:none}
         img.style.setProperty("--sprite-dy", `${dy.toFixed(1)}px`);
       };
 
-      if (img.complete && img.naturalWidth) {
-        applyFit();
-      } else {
-        img.addEventListener("load", applyFit, { once: true });
-      }
+      if (img.complete && img.naturalWidth) applyFit();
+      else img.addEventListener("load", applyFit, { once: true });
     });
   }
 
