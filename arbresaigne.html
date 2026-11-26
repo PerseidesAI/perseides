@@ -40,7 +40,7 @@
 @font-face{font-family:"IM Fell English";font-weight:400;font-style:italic;font-display:swap;src:url("assets/fonts/im-fell-english-400-italic.woff2") format("woff2")}
 @font-face{font-family:"Cinzel";font-weight:400;font-style:normal;font-display:swap;src:url("assets/fonts/cinzel-400.woff2") format("woff2")}
 @font-face{font-family:"Cinzel";font-weight:700;font-style:normal;font-display:swap;src:url("assets/fonts/cinzel-700.woff2") format("woff2")}
-@font-face{font-family:"EB Garamond";font-weight:400;font-style:italic;font-display:swap;src:url("assets/fonts/eb-garamond-400-italic-grec.woff2") format("woff2");unicode-range:U+0370-0377,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
+@font-face{font-family:"EB Garamond";font-weight:400;font-style:italic;font-display:swap;src:url("assets/fonts/eb-garamond-400-italic-grec.woff2") format("woff2");unicode-range:U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF}
 
 :root{
   color-scheme:dark;
@@ -158,19 +158,114 @@ section[id]{scroll-margin-top:1.5rem}
 .rule span{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--slate-hi) 35%,var(--slate-hi) 65%,transparent)}
 .rule i{width:8px;height:8px;border:1px solid var(--frost);transform:rotate(45deg)}
 
-/* Les trois animations du personnage, à leur taille d'origine (512 px, jamais redimensionnées) */
+/* Les trois animations du personnage, ajustées à l'arc et cliquables */
 .plates{display:flex;flex-wrap:wrap;justify-content:center;gap:2.5rem 2rem}
 .plate{margin:0;width:min(280px,100%);display:grid;justify-items:center;gap:.85rem}
 .niche{position:relative;width:100%;max-width:280px;aspect-ratio:280/330;background:var(--arch) center/100% 100% no-repeat}
-.niche img{
-  position:absolute;
-  inset:0;
+.niche-trigger{
+  position:relative;
+  display:block;
   width:100%;
   height:100%;
-  max-width:none;
-  object-fit:none;
-  object-position:50% calc(50% + 83px);
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+}
+.niche-trigger:focus-visible{
+  outline:2px solid var(--ice);
+  outline-offset:3px;
+}
+.niche img{
+  position:absolute;
+  left:50%;
+  top:54%;
+  width:auto;
+  height:auto;
+  max-width:74%;
+  max-height:66%;
+  object-fit:contain;
+  transform:translate(-50%,-50%) scale(0.72);
+  transform-origin:center center;
   image-rendering:pixelated;
+  transition:transform .2s ease,filter .2s ease;
+}
+.niche-trigger:hover img{
+  transform:translate(-50%,-50%) scale(0.78);
+  filter:brightness(1.08);
+}
+
+/* Fenêtre modale pour afficher le GIF */
+.gif-modal{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:1.25rem;
+  background:rgba(2,7,16,.84);
+  backdrop-filter:blur(4px);
+}
+.gif-modal.is-open{display:flex}
+.gif-modal__dialog{
+  position:relative;
+  max-width:min(92vw,580px);
+  width:100%;
+  padding:1.5rem 1.5rem 1.25rem;
+  background-color:var(--night);
+  background-image:linear-gradient(var(--panel),var(--panel)),var(--forest);
+  background-size:auto,250px 250px;
+  border:1px solid var(--slate-hi);
+  box-shadow:0 24px 64px rgba(0,0,0,.75);
+  display:grid;
+  gap:1rem;
+  justify-items:center;
+  text-align:center;
+}
+.gif-modal__dialog::before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px solid var(--slate);
+  pointer-events:none;
+}
+.gif-modal__close{
+  position:relative;
+  z-index:1;
+  align-self:flex-end;
+  padding:.35rem .75rem;
+  font:400 .78rem/1 var(--font-label);
+  letter-spacing:.16em;
+  text-transform:uppercase;
+  color:var(--ice);
+  background:var(--ink);
+  border:1px solid var(--slate-hi);
+  cursor:pointer;
+}
+.gif-modal__close:hover{
+  color:var(--snow);
+  border-color:var(--frost);
+}
+.gif-modal__img{
+  position:relative;
+  z-index:1;
+  display:block;
+  max-width:100%;
+  max-height:68vh;
+  width:auto;
+  height:auto;
+  image-rendering:pixelated;
+  border:1px solid var(--slate);
+  background:var(--ink);
+}
+.gif-modal__caption{
+  position:relative;
+  z-index:1;
+  margin:0;
+  font-style:italic;
+  font-size:1.05rem;
+  color:var(--frost);
 }
 .numeral{
   position:absolute;
@@ -277,7 +372,7 @@ a.logo{color:var(--snow);text-decoration:none}
       </a>
       <nav class="menu" aria-label="Navigation principale">
         <ul>
-          <li><a href="#dame-blanche">Les arbres qui saignent.</title></a></li>
+          <li><a href="#arbres-qui-saignent">Les arbres qui saignent</a></li>
           <li><a href="#créature">Créature</a></li>
           <li><a href="#origines">Origines</a></li>
         </ul>
@@ -289,8 +384,8 @@ a.logo{color:var(--snow);text-decoration:none}
     <div class="wrap">
       <div class="page">
 
-        <section id="dame-blanche" class="title" aria-labelledby="nom-personnage">
-          <h1 class="character-name logo" id="nom-personnage">Les arbres qui saignent.</h1>
+        <section id="arbres-qui-saignent" class="title" aria-labelledby="nom-personnage">
+          <h1 class="character-name logo" id="nom-personnage">Les arbres qui saignent</h1>
           <p style="font-style: italic; color: var(--frost); opacity: .8; font-size: 0.9em;">Récits des forêts septentrionales et des chantiers forestiers.</p>
           <p class="lead">Arbres mystérieux versant un liquide rouge semblable au sang sous la hache.</p>
         </section>
@@ -301,7 +396,9 @@ a.logo{color:var(--snow);text-decoration:none}
           <figure class="plate">
             <div class="niche">
               <span class="numeral" aria-hidden="true">I</span>
-              <img src="assets/img/arbre-repos.gif" width="512" height="512" alt="Arbre au repos.">
+              <button type="button" class="niche-trigger" data-gif="assets/img/arbre-repos.gif" data-caption="Arbre — repos" aria-label="Ouvrir l’animation Arbre au repos dans une fenêtre">
+                <img src="assets/img/arbre-repos.gif" width="512" height="512" alt="Arbre au repos.">
+              </button>
             </div>
             <figcaption><span class="pose">repos</span></figcaption>
           </figure>
@@ -309,7 +406,9 @@ a.logo{color:var(--snow);text-decoration:none}
           <figure class="plate">
             <div class="niche">
               <span class="numeral" aria-hidden="true">II</span>
-              <img src="assets/img/arbre-dégât.gif" width="512" height="512" alt="Arbre dégât.">
+              <button type="button" class="niche-trigger" data-gif="assets/img/arbre-dégât.gif" data-caption="Arbre — dégât" aria-label="Ouvrir l’animation Arbre dégât dans une fenêtre">
+                <img src="assets/img/arbre-dégât.gif" width="512" height="512" alt="Arbre dégât.">
+              </button>
             </div>
             <figcaption><span class="pose">dégât</span></figcaption>
           </figure>
@@ -317,7 +416,9 @@ a.logo{color:var(--snow);text-decoration:none}
           <figure class="plate">
             <div class="niche">
               <span class="numeral" aria-hidden="true">III</span>
-              <img src="assets/img/arbre-attaque.gif" width="512" height="512" alt="Arbre attaque.">
+              <button type="button" class="niche-trigger" data-gif="assets/img/arbre-attaque.gif" data-caption="Arbre — attaque" aria-label="Ouvrir l’animation Arbre attaque dans une fenêtre">
+                <img src="assets/img/arbre-attaque.gif" width="512" height="512" alt="Arbre attaque.">
+              </button>
             </div>
             <figcaption><span class="pose">attaque</span></figcaption>
           </figure>
@@ -372,5 +473,58 @@ a.logo{color:var(--snow);text-decoration:none}
 
 </div>
 
+  <div class="gif-modal" id="gifModal" role="dialog" aria-modal="true" aria-labelledby="gifModalCaption" hidden>
+    <div class="gif-modal__dialog">
+      <button type="button" class="gif-modal__close" id="gifModalClose" aria-label="Fermer la fenêtre">Fermer &times;</button>
+      <img class="gif-modal__img" id="gifModalImg" src="" alt="">
+      <p class="gif-modal__caption" id="gifModalCaption"></p>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const modal = document.getElementById("gifModal");
+  const modalImg = document.getElementById("gifModalImg");
+  const modalCaption = document.getElementById("gifModalCaption");
+  const closeBtn = document.getElementById("gifModalClose");
+  let lastTrigger = null;
+
+  function openModal(trigger) {
+    const src = trigger.getAttribute("data-gif");
+    const caption = trigger.getAttribute("data-caption") || "";
+    lastTrigger = trigger;
+    modalImg.src = src;
+    modalImg.alt = caption;
+    modalCaption.textContent = caption;
+    modal.hidden = false;
+    requestAnimationFrame(() => modal.classList.add("is-open"));
+    closeBtn.focus();
+  }
+
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.hidden = true;
+    modalImg.src = "";
+    if (lastTrigger) {
+      lastTrigger.focus();
+      lastTrigger = null;
+    }
+  }
+
+  document.querySelectorAll(".niche-trigger").forEach((btn) => {
+    btn.addEventListener("click", () => openModal(btn));
+  });
+
+  closeBtn.addEventListener("click", closeModal);
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !modal.hidden) closeModal();
+  });
+})();
+</script>
 </body>
 </html>
