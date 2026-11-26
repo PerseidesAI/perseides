@@ -147,20 +147,66 @@ section[id]{scroll-margin-top:1.5rem}
 .rule span{flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--slate-hi) 35%,var(--slate-hi) 65%,transparent)}
 .rule i{width:8px;height:8px;border:1px solid var(--frost);transform:rotate(45deg)}
 
-/* Les trois animations du personnage, à leur taille d'origine (512 px, jamais redimensionnées) */
+/* Les trois animations du personnage : grandeur maximale sans dépasser les arcs et sans zoomer */
 .plates{display:flex;flex-wrap:wrap;justify-content:center;gap:2.5rem 2rem}
 .plate{margin:0;width:min(280px,100%);display:grid;justify-items:center;gap:.85rem}
 .niche{position:relative;width:100%;max-width:280px;aspect-ratio:280/330;background:var(--arch) center/100% 100% no-repeat}
-.niche img{
-  position:absolute;
-  inset:0;
+.niche-trigger{
+  position:relative;
+  display:block;
   width:100%;
   height:100%;
-  max-width:none;
-  object-fit:none;
-  object-position:50% calc(50% + 83px);
-  image-rendering:pixelated;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+  overflow:hidden;
 }
+.niche-trigger:focus-visible{
+  outline:2px solid var(--ice);
+  outline-offset:3px;
+}
+.niche img{
+  position:absolute;
+  left:50%;
+  top:62%;
+  width:auto;
+  height:auto;
+  max-width:none;
+  object-fit:contain;
+  image-rendering:pixelated;
+  transform:translate(calc(-50% - var(--sprite-cx, 0px) * var(--sprite-scale, 1)), calc(-50% - var(--sprite-cy, 0px) * var(--sprite-scale, 1))) scale(var(--sprite-scale, 1));
+  transform-origin:center center;
+  transition:transform .2s ease,filter .2s ease;
+}
+.niche-trigger:hover img{
+  transform:translate(calc(-50% - var(--sprite-cx, 0px) * var(--sprite-scale, 1)), calc(-50% - var(--sprite-cy, 0px) * var(--sprite-scale, 1))) scale(calc(var(--sprite-scale, 1) * 1.03));
+  filter:brightness(1.06);
+}
+
+/* Affichage du GIF seul en grand sans fenêtre */
+.gif-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:1.5rem;
+  background:rgba(2,7,16,.88);
+  cursor:pointer;
+}
+.gif-overlay.is-open{display:flex}
+.gif-overlay__img{
+  display:block;
+  max-width:94vw;
+  max-height:92vh;
+  width:auto;
+  height:auto;
+  image-rendering:pixelated;
+  cursor:default;
+}
+
 .numeral{
   position:absolute;
   top:40px;
@@ -296,25 +342,28 @@ a.logo{color:var(--snow);text-decoration:none}
           <figure class="plate">
             <div class="niche">
               <span class="numeral" aria-hidden="true">I</span>
-              <img src="assets/img/hippogriffe-repos.gif" width="512" height="512" alt="Hippogriffe repos.">
-            </div>
-            <figcaption><span class="pose">repos</span></figcaption>
+              <button type="button" class="niche-trigger" data-gif="assets/img/hippogriffe-repos.gif" data-caption="Hippogriffe — repos" aria-label="Afficher l’animation Hippogriffe repos en grand">
+                <img src="assets/img/hippogriffe-repos.gif" width="512" height="512" alt="Hippogriffe repos.">
+              </button>
+            </div><figcaption><span class="pose">repos</span></figcaption>
           </figure>
 
           <figure class="plate">
             <div class="niche">
               <span class="numeral" aria-hidden="true">II</span>
-              <img src="assets/img/hippogriffe-marche.gif" width="512" height="512" alt="Hippogriffe marche.">
-            </div>
-            <figcaption><span class="pose">marche</span></figcaption>
+              <button type="button" class="niche-trigger" data-gif="assets/img/hippogriffe-marche.gif" data-caption="Hippogriffe — marche" aria-label="Afficher l’animation Hippogriffe marche en grand">
+                <img src="assets/img/hippogriffe-marche.gif" width="512" height="512" alt="Hippogriffe marche.">
+              </button>
+            </div><figcaption><span class="pose">marche</span></figcaption>
           </figure>
 
           <figure class="plate">
             <div class="niche">
               <span class="numeral" aria-hidden="true">III</span>
-              <img src="assets/img/hippogriffe-course.gif" width="512" height="512" alt="Hippogriffe course.">
-            </div>
-            <figcaption><span class="pose">course</span></figcaption>
+              <button type="button" class="niche-trigger" data-gif="assets/img/hippogriffe-course.gif" data-caption="Hippogriffe — course" aria-label="Afficher l’animation Hippogriffe course en grand">
+                <img src="assets/img/hippogriffe-course.gif" width="512" height="512" alt="Hippogriffe course.">
+              </button>
+            </div><figcaption><span class="pose">course</span></figcaption>
           </figure>
         </div>
 
@@ -357,5 +406,91 @@ a.logo{color:var(--snow);text-decoration:none}
 
 </div>
 
+<div class="gif-overlay" id="gifOverlay" role="dialog" aria-modal="true" aria-label="Aperçu du GIF" hidden>
+  <img class="gif-overlay__img" id="gifOverlayImg" src="" alt="">
+</div>
+
+<script>
+(function () {
+  const SPRITE_SPECS = {"arbre-attaque.gif": {"scale": 0.6935, "cx_norm": 0.0005, "cy_norm": -0.145}, "arbre-dégât.gif": {"scale": 0.7157, "cx_norm": -0.0005, "cy_norm": -0.1382}, "arbre-repos.gif": {"scale": 0.7232, "cx_norm": 0.0, "cy_norm": -0.145}, "cheval-marin-nage-II.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0635}, "cheval-marin-nage.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0605}, "cheval-marin-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0615}, "dame-blanche-pleure.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0742}, "dame-blanche-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0791}, "dame-blanche-vol.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.0557}, "gnome-course.gif": {"scale": 1.0, "cx_norm": -0.0039, "cy_norm": 0.0137}, "gnome-marche.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": 0.0107}, "gnome-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": 0.0049}, "hippogriffe-course.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.0811}, "hippogriffe-marche.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0752}, "hippogriffe-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0742}, "lutin-course.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0371}, "lutin-marche.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0371}, "lutin-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0381}, "memphré-nage-II.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.1445}, "memphré-nage.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.1191}, "memphré-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.1104}, "nain-jaune-course.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0508}, "nain-jaune-marche.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0527}, "nain-jaune-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0537}, "ponik-nage-II.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0098}, "ponik-nage.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0098}, "ponik-repos.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0098}, "sasquatch-attaque.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0469}, "sasquatch-course.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.04}, "sasquatch-repos.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0352}, "sirene-nage-II.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": -0.0273}, "sirene-nage.gif": {"scale": 1.0, "cx_norm": 0.0029, "cy_norm": -0.0166}, "sirene-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": 0.0078}, "windigo-attaque.gif": {"scale": 1.0, "cx_norm": -0.0029, "cy_norm": -0.041}, "windigo-marche.gif": {"scale": 1.0, "cx_norm": -0.0068, "cy_norm": -0.043}, "windigo-repos.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": -0.0479}};
+
+  function fitSpritesInArch() {
+    document.querySelectorAll(".niche").forEach((niche) => {
+      const img = niche.querySelector("img");
+      if (!img) return;
+      const applyFit = () => {
+        const rawSrc = img.getAttribute("src") || "";
+        const fileName = decodeURIComponent(rawSrc.split("/").pop().split("?")[0]);
+        const spec = SPRITE_SPECS[fileName];
+        const nw = img.naturalWidth || (spec ? spec.cw : 512);
+        const nh = img.naturalHeight || (spec ? spec.ch : 512);
+        const nRect = niche.getBoundingClientRect();
+        const boxW = nRect.width || 280;
+        const boxH = nRect.height || 330;
+
+        let scale = spec ? spec.scale : Math.min(1, (boxW * 0.80) / nw, (boxH * 0.66) / nh);
+        if (scale > 1) scale = 1;
+
+        const cxPx = spec ? (spec.cx_norm * nw) : 0;
+        const cyPx = spec ? (spec.cy_norm * nh) : 0;
+
+        img.style.setProperty("--sprite-scale", scale.toFixed(4));
+        img.style.setProperty("--sprite-cx", `${cxPx.toFixed(2)}px`);
+        img.style.setProperty("--sprite-cy", `${cyPx.toFixed(2)}px`);
+      };
+
+      if (img.complete && img.naturalWidth) {
+        applyFit();
+      } else {
+        img.addEventListener("load", applyFit, { once: true });
+      }
+    });
+  }
+
+  fitSpritesInArch();
+  window.addEventListener("resize", fitSpritesInArch);
+
+  const overlay = document.getElementById("gifOverlay");
+  if (!overlay) return;
+  const overlayImg = document.getElementById("gifOverlayImg");
+  let lastTrigger = null;
+
+  function openGif(trigger) {
+    const img = trigger.querySelector("img");
+    const src = trigger.getAttribute("data-gif") || (img ? img.getAttribute("src") : "");
+    const alt = trigger.getAttribute("data-caption") || (img ? img.getAttribute("alt") : "") || "";
+    if (!src) return;
+    lastTrigger = trigger;
+    overlayImg.src = src;
+    overlayImg.alt = alt;
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
+  }
+
+  function closeGif() {
+    overlay.classList.remove("is-open");
+    overlay.hidden = true;
+    overlayImg.src = "";
+    if (lastTrigger) {
+      lastTrigger.focus();
+      lastTrigger = null;
+    }
+  }
+
+  document.querySelectorAll(".niche-trigger").forEach((btn) => {
+    btn.addEventListener("click", () => openGif(btn));
+  });
+
+  overlay.addEventListener("click", (e) => {
+    if (e.target !== overlayImg) closeGif();
+  });
+
+  overlayImg.addEventListener("click", closeGif);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !overlay.hidden) closeGif();
+  });
+})();
+</script>
 </body>
 </html>
