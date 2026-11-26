@@ -473,18 +473,14 @@ a.logo{color:var(--snow);text-decoration:none}
 
 </div>
 
-<!-- Fenêtre modale pour l'affichage plein écran du GIF -->
-<div class="gif-modal" id="gifModal" role="dialog" aria-modal="true" aria-labelledby="gifModalCaption" hidden>
-  <div class="gif-modal__dialog">
-    <button type="button" class="gif-modal__close" id="gifModalClose" aria-label="Fermer la fenêtre">Fermer &times;</button>
-    <img class="gif-modal__img" id="gifModalImg" src="" alt="">
-    <p class="gif-modal__caption" id="gifModalCaption"></p>
+<div class="gif-overlay" id="gifOverlay" role="dialog" aria-modal="true" aria-label="Aperçu du GIF" hidden>
+    <img class="gif-overlay__img" id="gifOverlayImg" src="" alt="">
   </div>
-</div>
 
 <script>
 (function () {
-  // Ajuste automatiquement les sprites trop grands pour tenir dans chaque arc (.niche)
+  // Ajuste chaque sprite pour qu'il soit le plus grand possible dans l'arc (.niche)
+  // sans dépasser les bords, et qu'il soit seulement rapetissé s'il est trop grand.
   function fitSpritesToNiches() {
     document.querySelectorAll(".niche").forEach((niche) => {
       const img = niche.querySelector("img");
@@ -493,14 +489,24 @@ a.logo{color:var(--snow);text-decoration:none}
         const nw = img.naturalWidth || 512;
         const nh = img.naturalHeight || 512;
         const nRect = niche.getBoundingClientRect();
-        const availW = (nRect.width || 280) * 0.76;
-        const availH = (nRect.height || 330) * 0.62;
-        let scale = 1;
-        if (nw > availW || nh > availH) {
-          scale = Math.min(availW / nw, availH / nh);
+        const boxW = nRect.width || 280;
+        const boxH = nRect.height || 330;
+
+        // Zone utile à l'intérieur des bords de l'arc
+        const maxW = boxW * 0.84;
+        const maxH = boxH * 0.74;
+
+        // Ratio pour tenir dans la niche (jamais agrandi au-delà de 1)
+        const fitRatio = Math.min(maxW / nw, maxH / nh, 1);
+
+        let scale = fitRatio;
+        if (nw > boxW || nh > boxH) {
+          scale = Math.min(maxW / nw, maxH / nh);
         }
+
         img.style.setProperty("--sprite-scale", scale.toFixed(4));
       };
+
       if (img.complete && img.naturalWidth) {
         applyScale();
       } else {
@@ -512,31 +518,27 @@ a.logo{color:var(--snow);text-decoration:none}
   fitSpritesToNiches();
   window.addEventListener("resize", fitSpritesToNiches);
 
-  const modal = document.getElementById("gifModal");
-  if (!modal) return;
-  const modalImg = document.getElementById("gifModalImg");
-  const modalCaption = document.getElementById("gifModalCaption");
-  const closeBtn = document.getElementById("gifModalClose");
+  const overlay = document.getElementById("gifOverlay");
+  if (!overlay) return;
+  const overlayImg = document.getElementById("gifOverlayImg");
   let lastTrigger = null;
 
-  function openModal(trigger) {
+  function openGif(trigger) {
     const img = trigger.querySelector("img");
     const src = trigger.getAttribute("data-gif") || (img ? img.getAttribute("src") : "");
-    const caption = trigger.getAttribute("data-caption") || (img ? img.getAttribute("alt") : "") || "";
+    const alt = trigger.getAttribute("data-caption") || (img ? img.getAttribute("alt") : "") || "";
     if (!src) return;
     lastTrigger = trigger;
-    modalImg.src = src;
-    modalImg.alt = caption;
-    modalCaption.textContent = caption;
-    modal.hidden = false;
-    requestAnimationFrame(() => modal.classList.add("is-open"));
-    closeBtn.focus();
+    overlayImg.src = src;
+    overlayImg.alt = alt;
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add("is-open"));
   }
 
-  function closeModal() {
-    modal.classList.remove("is-open");
-    modal.hidden = true;
-    modalImg.src = "";
+  function closeGif() {
+    overlay.classList.remove("is-open");
+    overlay.hidden = true;
+    overlayImg.src = "";
     if (lastTrigger) {
       lastTrigger.focus();
       lastTrigger = null;
@@ -544,17 +546,17 @@ a.logo{color:var(--snow);text-decoration:none}
   }
 
   document.querySelectorAll(".niche-trigger").forEach((btn) => {
-    btn.addEventListener("click", () => openModal(btn));
+    btn.addEventListener("click", () => openGif(btn));
   });
 
-  closeBtn.addEventListener("click", closeModal);
-
-  modal.addEventListener("click", (e) => {
-    if (e.target === modal) closeModal();
+  overlay.addEventListener("click", (e) => {
+    if (e.target !== overlayImg) closeGif();
   });
+
+  overlayImg.addEventListener("click", closeGif);
 
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !modal.hidden) closeModal();
+    if (e.key === "Escape" && !overlay.hidden) closeGif();
   });
 })();
 </script>
