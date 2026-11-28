@@ -402,7 +402,50 @@ a.logo{color:var(--snow);text-decoration:none}
 </div>
 <script>
 (function () {
-  const SPRITE_SPECS = {"arbre-attaque.gif": {"scale": 0.6935, "cx_norm": 0.0005, "cy_norm": -0.145}, "arbre-dégât.gif": {"scale": 0.7157, "cx_norm": -0.0005, "cy_norm": -0.1382}, "arbre-repos.gif": {"scale": 0.7232, "cx_norm": 0.0, "cy_norm": -0.145}, "cheval-marin-nage-II.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0635}, "cheval-marin-nage.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0605}, "cheval-marin-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0615}, "dame-blanche-pleure.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0742}, "dame-blanche-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0791}, "dame-blanche-vol.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.0557}, "gnome-course.gif": {"scale": 1.0, "cx_norm": -0.0039, "cy_norm": 0.0137}, "gnome-marche.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": 0.0107}, "gnome-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": 0.0049}, "hippogriffe-course.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.0811}, "hippogriffe-marche.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0752}, "hippogriffe-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0742}, "lutin-course.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0371}, "lutin-marche.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0371}, "lutin-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0381}, "memphré-nage-II.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.1445}, "memphré-nage.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.1191}, "memphré-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.1104}, "nain-jaune-course.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0508}, "nain-jaune-marche.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0527}, "nain-jaune-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0537}, "ponik-nage-II.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0098}, "ponik-nage.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0098}, "ponik-repos.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0098}, "sasquatch-attaque.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0469}, "sasquatch-course.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.04}, "sasquatch-repos.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0352}, "sirene-nage-II.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": -0.0273}, "sirene-nage.gif": {"scale": 1.0, "cx_norm": 0.0029, "cy_norm": -0.0166}, "sirene-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": 0.0078}, "windigo-attaque.gif": {"scale": 1.0, "cx_norm": -0.0029, "cy_norm": -0.041}, "windigo-marche.gif": {"scale": 1.0, "cx_norm": -0.0068, "cy_norm": -0.043}, "windigo-repos.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": -0.0479}};
+const SPRITE_SPECS = {
+    "arbre-attaque.gif": {"scale": 0.6935, "cx_norm": 0.0005, "cy_norm": -0.145},
+    "arbre-dégât.gif": {"scale": 0.7157, "cx_norm": -0.0005, "cy_norm": -0.1382},
+    "arbre-repos.gif": {"scale": 0.7232, "cx_norm": 0.0, "cy_norm": -0.145},
+    "cheval-marin-nage-II.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0635},
+    "cheval-marin-nage.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0605},
+    "cheval-marin-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0615},
+    "cochon-bleu-course.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0508},
+    "cochon-bleu-marche.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0527},
+    "cochon-bleu-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0537},
+    "dame-blanche-pleure.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0742},
+    "dame-blanche-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0791},
+    "dame-blanche-vol.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.0557},
+    "gnome-course.gif": {"scale": 1.0, "cx_norm": -0.0039, "cy_norm": 0.0137},
+    "gnome-marche.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": 0.0107},
+    "gnome-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": 0.0049},
+    "hippogriffe-course.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.0811},
+    "hippogriffe-marche.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0752},
+    "hippogriffe-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0742},
+    "lutin-course.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0371},
+    "lutin-marche.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0371},
+    "lutin-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0381},
+    "memphré-nage-II.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.1445},
+    "memphré-nage.gif": {"scale": 1.0, "cx_norm": -0.001, "cy_norm": -0.1191},
+    "memphré-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.1104},
+    "nain-jaune-course.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0508},
+    "nain-jaune-marche.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0527},
+    "nain-jaune-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0537},
+    "ponik-nage-II.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0098},
+    "ponik-nage.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": -0.0098},
+    "ponik-repos.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0098},
+    "sasquatch-attaque.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0469},
+    "sasquatch-course.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.04},
+    "sasquatch-repos.gif": {"scale": 1.0, "cx_norm": 0.001, "cy_norm": -0.0352},
+    "sirene-nage-II.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": -0.0273},
+    "sirene-nage.gif": {"scale": 1.0, "cx_norm": 0.0029, "cy_norm": -0.0166},
+    "sirene-repos.gif": {"scale": 1.0, "cx_norm": 0.0, "cy_norm": 0.0078},
+    "windigo-attaque.gif": {"scale": 1.0, "cx_norm": -0.0029, "cy_norm": -0.041},
+    "windigo-marche.gif": {"scale": 1.0, "cx_norm": -0.0068, "cy_norm": -0.043},
+    "windigo-repos.gif": {"scale": 1.0, "cx_norm": 0.002, "cy_norm": -0.0479}
+  };
+```[cite: 2, 3]
+
+Cela remettra `cochon-bleu-repos.gif` à `scale: 1.0` avec son décalage vertical `cy_norm: -0.0537`, identique à sa fiche détaillée[cite: 2, 3].
 
   function fitCreaturesInArch() {
     document.querySelectorAll(".creature-niche").forEach((niche) => {
